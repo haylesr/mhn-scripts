@@ -3,6 +3,7 @@ import os
 import re
 import getopt
 import sys
+import random
 
 from pyfiglet import figlet_format
 
@@ -26,6 +27,8 @@ everything = False
 #Initialize verbose levels
 geoLevel = 0
 
+fonts = ['big','bulbhead','block','doh','doom','isometric1','isometric2','isometric3','isometric4','larry3d','rectangles','smkeyboard','usaflag']
+
 #Proccess all command line arguments and gracefully exit upon failure
 try:
   options, remainder = getopt.getopt(sys.argv[1:],'hgg:a',['geo','geo:','help','all'])
@@ -36,7 +39,7 @@ except getopt.GetoptError:
 #Process flags
 for opt, arg in options:
     if opt in ('-h','-help'):
-        print figlet_format('Stats!', font='big')
+        print figlet_format('Stats!', font=random.randrange(len(fonts)))
         print usage
         print
         print 'Options:'
