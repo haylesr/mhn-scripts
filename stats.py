@@ -7,9 +7,10 @@ import random
 
 from pyfiglet import figlet_format
 
-#Initialize dictionaries for tracking country specific metrics
+#Initialize dictionaries and list for tracking country specific metrics
 countriesByIP = {}
 countByCountry = {}
+distinctCountries = []
 
 #Initialize lists to track IP addresses
 allIP = []
@@ -19,42 +20,63 @@ notIdentified = []
 usage = "Usage: stats.py [Options]"
 
 #Initialize flags to default value of false
-verbose = False
-veryVerbose = False
 geo = False
 everything = False
+honeypots = False
+verbose = False
+veryVerbose = False
+ports = False
+address = False
+malware = False
+credentials = False
+usernames = False
+passwords = False
 
-#Initialize verbose levels
-geoLevel = 0
-
-fonts = ['big','bulbhead','block','doh','doom','isometric1','isometric2','isometric3','isometric4','larry3d','rectangles','smkeyboard','usaflag']
+fonts = ['big','bulbhead','block','doh','doom','isometric1','isometric3','larry3d','rectangles','smkeyboard']
 
 #Proccess all command line arguments and gracefully exit upon failure
 try:
-  options, remainder = getopt.getopt(sys.argv[1:],'hgg:a',['geo','geo:','help','all'])
+  options, remainder = getopt.getopt(sys.argv[1:],'hvVgapmic',['honeypots','geo','help','all','ports','ip','malware','credentials','usernames','passwords'])
 except getopt.GetoptError:
   print usage
   sys.exit(2)
 
 #Process flags
 for opt, arg in options:
-    if opt in ('-h','-help'):
+    if opt in ('--help'):
         print figlet_format('Stats!', font=fonts[random.randrange(len(fonts))])
         print usage
         print
         print 'Options:'
-        print '     -a --all       Get all metrics'
-        print '     -h --help      Print help menu'
-        print '     -g --geo       Get geo location'
+        print '     --help              Print help menu'
+        print '     -a --all            Get all metrics'
+        print '     -g --geo            Get geo location (could take a little while)'
+        print '     -h --honeypots      Separate honepot types'
+        print '     -v                  Verbose'
+        print '     -V                  Very Verbose'
         sys.exit()
     if opt in ('-g','--geo'):
       geo = True
-      if arg:
-        geoLevel = arg
-      print "geo"
     if opt in ('-a','--all'):
       everything = True
-      print "all"
+    if opt in ('-h','--honeypots'):
+      honeypots = True
+    if opt in ('-v'):
+      verbose = True
+    if opt in ('-V'):
+      veryVerbose = True
+    if opt in ('-p','--ports'):
+      ports = True
+    if opt in ('-m','--malware'):
+      malware = True
+    if opt in ('-i','--ip'):
+      addresses = True
+    if opt in ('-c','--credentials'):
+      credentials = True
+    if opt in ('--usernames'):
+      usernames = True
+    if opt in ('--passwords'):
+      passwords = True
 
 #Execute mongodb query
 def executeQuery(query):
@@ -65,70 +87,107 @@ def executeCommand(command):
   return os.popen(command).read()
 
 totalAttacks = executeQuery("db.session.count()")
-numUniqueIPs = executeQuery("db.session.distinct('source_ip').length")
-numKippoAttacks = executeQuery("db.session.find({'honeypot':'kippo'}).count()")
-numUniqueUsernames = executeQuery("db.session.distinct('auth_attempts.login').length")
-numUniquePasswords = executeQuery("db.session.distinct('auth_attempts.password').length")
-numDionaeaAttacks = executeQuery("db.session.find({'honeypot':'dionaea'}).count()")
-numGlastopfAttacks = executeQuery("db.session.find({'honeypot':'glastopf'}).count()")
-numAmosAttacks = executeQuery("db.session.find({'honeypot':'amun'}).count()")
-numP0fAttacks =  executeQuery("db.session.find({'honeypot':'p0f'}).count()")
-numUniquePorts = executeQuery("db.session.distinct('destination_port').length")
-numMalwareSamples = executeQuery("db.file.count()")
 distinctIPList = executeQuery("db.session.distinct('source_ip')").split(',')
-distinctCountries = []
-
-
 for ip in distinctIPList:
   ip = re.sub(r'\\n\']','',ip)
   if re.match(r'\d+\.\d+\.\d+\.\d+',ip):
+    allIP.append(ip)
+
+def getHoneypots():
+  print "Kippo attacks: " + executeQuery("db.session.find({'honeypot':'kippo'}).count()")
+  print "Dionaea attacks: " + executeQuery("db.session.find({'honeypot':'dionaea'}).count()")
+  print "Glastopf attacks: " + executeQuery("db.session.find({'honeypot':'glastopf'}).count()")
+  print "Amun attacks: " + executeQuery("db.session.find({'honeypot':'amun'}).count()")
+  print "p0f attacks: " + executeQuery("db.session.find({'honeypot':'p0f'}).count()")
+
+def getMalware():
+  print "Malware samples: " + executeQuery("db.file.count()")
+
+def getPorts():
+  print "Distinct ports attacked: " + executeQuery("db.session.distinct('destination_port').length")
+
+def getAddresses():
+  print "Distinct IP addresses: " + executeQuery("db.session.distinct('source_ip').length")
+  if veryVerbose:
+    print "Distinct IP address list: "
+    for ip in distinctIPList
+
+def getUsernames():
+  print "   Unique usernames: " + executeQuery("db.session.distinct('auth_attempts.login').length")
+
+def getPasswords():
+  print "   Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
+
+def getCountryStats():
+  for ip in allIP:
     country = executeCommand("geoiplookup "+ip)
     country = re.sub(r'.*[A-Z]+, ','',country)
     country = re.sub(r'\n','',country)
     if country == "GeoIP Country Edition: IP Address not found":
       notIdentified.append(ip)
     else:
-      allIP.append(ip)
       countriesByIP[ip] = country
       if country in countByCountry:
         countByCountry[country] = countByCountry[country]+1
       else:
         countByCountry[country] = 1
-for country in countriesByIP.values():
-  if country not in distinctCountries:
-    distinctCountries.append(country)
 
-def getCountryStats():
+  for country in countriesByIP.values():
+    if country not in distinctCountries:
+      distinctCountries.append(country)
+
   for country in distinctCountries:
-    x = 0
+    numAttacks = 0
     print country + ": "
-    print "   Percent of unique IP addresses: " + str(round(countByCountry[country]/float(len(countriesByIP)),4)*100) + "%"
+    print "   Percent of all IP addresses: " + str(round(countByCountry[country]/float(len(countriesByIP)),4)*100) + "%"
     for ip in allIP:
       if countriesByIP[ip] == country:
-        x = x + int(executeQuery("db.session.find({'source_ip':'"+ip+"'}).count()"))
-    print "   Percent of total attacks: " + str(round(x/float(totalAttacks),4)*100) + "%"
-    print "   Total IP addresses: " + str(countByCountry[country])
-    #print "   IP Addresses:"
-    #for ip,location in countriesByIP.items():
-      #if location == country:
-        #print "      "+ip
-    print
-  print "**Could not identify " + str(len(notIdentified)) + " IPs**"
-  #for ip in notIdentified:
-    #print "   "+ip
+        numAttacks = numAttacks + int(enumAttacksecuteQuery("db.session.find({'source_ip':'"+ip+"'}).count()"))
+    print "   Percent of all attacks: " + str(round(distinctCountries/float(totalAttacks),4)*100) + "%"
 
-print
-print "Total attacks: " + str(totalAttacks)
-print
-print "Unique countries: " + str(len(distinctCountries))
-print
-print "Unique IP addresses: " + str(numUniqueIPs)
-print "Kippo attacks: " + str(numKippoAttacks)
-print "   Unique usernames: " + str(numUniqueUsernames)
-print "   Unique passwords: " + str(numUniquePasswords)
-print "Dionaea attacks: " + str(numDionaeaAttacks)
-print "Glastopf attacks: " + str(numGlastopfAttacks)
-print "Amun attacks: " + str(numAmosAttacks)
-print "p0f attacks: " + str(numP0fAttacks)
-print "Unique ports attacked: " + str(numUniquePorts)
-print "Malware samples: " + str(numMalwareSamples)
+    if verbose:
+      print "   Total IP addresses: " + str(countByCountry[country])
+
+    if veryVerbose:
+      print "   IP Addresses:"
+      for ip,location in countriesByIP.items():
+        if location == country:
+          print "      "+ip
+    print
+
+  print "Unique countries: " + str(len(distinctCountries))
+
+  if verbose or veryVerbose:
+    print "**Could not identify " + str(len(notIdentified)) + " IPs**"
+  if veryVerbose:
+    for ip in notIdentified:
+      print "   "+ip
+
+def main():
+  print figlet_format('Stats!', font=fonts[random.randrange(len(fonts))])
+
+  if geo or everything:
+    getCountryStats()
+
+  if addresses or everything:
+    getAddresses()
+
+  if ports or everything:
+    getPorts()
+
+  if usernames or credentials or everything:
+    getUsernames()
+
+  if passwords or credentials or everything:
+    getPasswords()
+
+  if honeypots or everything:
+    getHoneypots()
+
+  if malware or everything:
+    getMalware()
+
+  print "Total attacks: " + str(totalAttacks)
+
+if __name__ == "__main__":
+    main()
