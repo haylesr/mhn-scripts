@@ -2,6 +2,12 @@ import sys
 import os
 import re
 import getopt
+import sys
+
+from colorama import init
+init(strip=not sys.stdout.isatty()) # strip colors if stdout is redirected
+from termcolor import cprint 
+from pyfiglet import figlet_format
 
 #Initialize dictionaries for tracking country specific metrics
 countriesByIP = {}
@@ -20,9 +26,12 @@ veryVerbose = False
 geo = False
 everything = False
 
+#Initialize verbose levels
+geoLevel = 0
+
 #Proccess all command line arguments and gracefully exit upon failure
 try:
-  options, remainder = getopt.getopt(sys.argv[1:],'hg:a',['geo','help','all'])
+  options, remainder = getopt.getopt(sys.argv[1:],'hgg:a',['geo','geo:','help','all'])
 except getopt.GetoptError:
   print usage
   sys.exit(2)
@@ -30,6 +39,7 @@ except getopt.GetoptError:
 #Process flags
 for opt, arg in options:
     if opt in ('-h','-help'):
+        cprint(figlet_format('Stats!', font='big'),'grey')
         print usage
         print
         print 'Options:'
@@ -39,6 +49,8 @@ for opt, arg in options:
         sys.exit()
     if opt in ('-g','--geo'):
       geo = True
+      if arg:
+        geoLevel = arg
       print "geo"
     if opt in ('-a','--all'):
       everything = True
