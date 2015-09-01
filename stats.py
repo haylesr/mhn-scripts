@@ -39,7 +39,7 @@ except getopt.GetoptError:
 #Process flags
 for opt, arg in options:
     if opt in ('-h','-help'):
-        print figlet_format('Stats!', font=font[random.randrange(len(fonts))])
+        print figlet_format('Stats!', font=fonts[random.randrange(len(fonts))])
         print usage
         print
         print 'Options:'
