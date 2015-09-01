@@ -97,7 +97,6 @@ distinctIPList = executeQuery("db.session.distinct('source_ip')").split(',')
 for ip in distinctIPList:
   ip = re.sub(r'\\n\']','',ip)
   if re.match(r'\d+\.\d+\.\d+\.\d+',ip):
-    print ip
     allIP.append(ip)
 
 def getHoneypots():
@@ -178,7 +177,7 @@ def main():
   if geo or everything:
     getCountryStats()
 
-  if addresses or everything:
+  if address or everything:
     getAddresses()
 
   if ports or everything:
