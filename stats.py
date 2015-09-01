@@ -110,7 +110,8 @@ def getAddresses():
   print "Distinct IP addresses: " + executeQuery("db.session.distinct('source_ip').length")
   if veryVerbose:
     print "Distinct IP address list: "
-    for ip in allIP
+    for ip in allIP:
+      print "      "+ip
 
 def getUsernames():
   print "   Unique usernames: " + executeQuery("db.session.distinct('auth_attempts.login').length")
