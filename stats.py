@@ -12,19 +12,20 @@ def executeQuery(query):
 
 #totalAttacks = int(os.popen("mongo mnemosyne --quiet --eval \"db.session.count()\"").read())
 totalAttacks = executeQuery("db.session.count()")
-numUniqueIPs = os.popen("mongo mnemosyne --quiet --eval \"db.session.distinct('source_ip').length\"").read()
-numKippoAttacks = os.popen("mongo mnemosyne --quiet --eval \"db.session.find({'honeypot':'kippo'}).count()\"").read()
-numUniqueUsernames = os.popen("mongo mnemosyne --quiet --eval \"db.session.distinct('auth_attempts.login').length\"").read()
-numUniquePasswords = os.popen("mongo mnemosyne --quiet --eval \"db.session.distinct('auth_attempts.password').length\"").read()
-numDionaeaAttacks = os.popen("mongo mnemosyne --quiet --eval \"db.session.find({'honeypot':'dionaea'}).count()\"").read()
-numGlastopfAttacks = os.popen("mongo mnemosyne --quiet --eval \"db.session.find({'honeypot':'glastopf'}).count()\"").read()
-numAmosAttacks = os.popen("mongo mnemosyne --quiet --eval \"db.session.find({'honeypot':'amun'}).count()\"").read()
-numP0fAttacks =  os.popen("mongo mnemosyne --quiet --eval \"db.session.find({'honeypot':'p0f'}).count()\"").read()
-numUniquePorts = os.popen("mongo mnemosyne --quiet --eval \"db.session.distinct('destination_port').length\"").read()
-numMalwareSamples = os.popen("mongo mnemosyne --quiet --eval \"db.file.count()\"").read()
+numUniqueIPs = executeQuery("db.session.distinct('source_ip').length")
+numKippoAttacks = executeQuery("db.session.find({'honeypot':'kippo'}).count()")
+numUniqueUsernames = executeQuery("db.session.distinct('auth_attempts.login').length")
+numUniquePasswords = executeQuery("db.session.distinct('auth_attempts.password').length")
+numDionaeaAttacks = executeQuery("db.session.find({'honeypot':'dionaea'}).count()")
+numGlastopfAttacks = executeQuery("db.session.find({'honeypot':'glastopf'}).count()")
+numAmosAttacks = executeQuery("db.session.find({'honeypot':'amun'}).count()")
+numP0fAttacks =  executeQuery("db.session.find({'honeypot':'p0f'}).count()")
+numUniquePorts = executeQuery("db.session.distinct('destination_port').length")
+numMalwareSamples = executeQuery("db.file.count()")
+distinctIPs = executeQuery("db.session.distinct('source_ip')")
 
 
-for ip in os.popen("mongo mnemosyne --quiet --eval \"db.session.distinct('source_ip')\"").read().split(','):
+for ip in distinctIPs.split(','):
   ip = re.sub(r'\\n\']','',ip)
   if re.match(r'\d+\.\d+\.\d+\.\d+',ip):
     output = os.popen("geoiplookup "+ip).read()
