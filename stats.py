@@ -4,9 +4,6 @@ import re
 import getopt
 import sys
 
-from colorama import init
-init(strip=not sys.stdout.isatty()) # strip colors if stdout is redirected
-from termcolor import cprint 
 from pyfiglet import figlet_format
 
 #Initialize dictionaries for tracking country specific metrics
@@ -39,7 +36,7 @@ except getopt.GetoptError:
 #Process flags
 for opt, arg in options:
     if opt in ('-h','-help'):
-        cprint(figlet_format('Stats!', font='big'),'grey')
+        print figlet_format('Stats!', font='big')
         print usage
         print
         print 'Options:'
