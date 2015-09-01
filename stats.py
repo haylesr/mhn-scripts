@@ -1,19 +1,57 @@
 import sys
 import os
 import re
+import getopt
 
+#Initialize dictionaries for tracking country specific metrics
 countriesByIP = {}
 countByCountry = {}
+
+#Initialize lists to track IP addresses
 allIP = []
 notIdentified = []
 
+#Set usage string to be used for error screens
+usage = "Usage: stats.py [Options]"
+
+#Initialize flags to default value of false
+verbose = False
+veryVerbose = False
+geo = False
+everything = False
+
+#Proccess all command line arguments and gracefully exit upon failure
+try:
+  options, remainder = getopt.getopt(sys.argv[1:],'hg:a',['geo','help','all'])
+except getopt.GetoptError:
+  print usage
+  sys.exit(2)
+
+#Process flags
+for opt, arg in options:
+    if opt in ('-h','-help'):
+        print usage
+        print
+        print 'Options:'
+        print '     -a --all       Get all metrics'
+        print '     -h --help      Print help menu'
+        print '     -g --geo       Get geo location'
+        sys.exit()
+    if opt in ('-g','--geo'):
+      geo = True
+      print "geo"
+    if opt in ('-a','--all'):
+      everything = True
+      print "all"
+
+#Execute mongodb query
 def executeQuery(query):
   return os.popen("mongo mnemosyne --quiet --eval \""+query+"\"").read()
 
+#Execute OS command
 def executeCommand(command):
   return os.popen(command).read()
 
-#totalAttacks = int(os.popen("mongo mnemosyne --quiet --eval \"db.session.count()\"").read())
 totalAttacks = executeQuery("db.session.count()")
 numUniqueIPs = executeQuery("db.session.distinct('source_ip').length")
 numKippoAttacks = executeQuery("db.session.find({'honeypot':'kippo'}).count()")
@@ -55,7 +93,7 @@ def getCountryStats():
     print "   Percent of unique IP addresses: " + str(round(countByCountry[country]/float(len(countriesByIP)),4)*100) + "%"
     for ip in allIP:
       if countriesByIP[ip] == country:
-        x = x + int(os.popen("mongo mnemosyne --quiet --eval \"db.session.find({'source_ip':'"+ip+"'}).count()\"").read())
+        x = x + int(executeQuery("db.session.find({'source_ip':'"+ip+"'}).count()"))
     print "   Percent of total attacks: " + str(round(x/float(totalAttacks),4)*100) + "%"
     print "   Total IP addresses: " + str(countByCountry[country])
     #print "   IP Addresses:"
