@@ -52,6 +52,12 @@ for opt, arg in options:
         print '     -a --all            Get all metrics'
         print '     -g --geo            Get geo location (could take a little while)'
         print '     -h --honeypots      Separate honepot types'
+        print '     -i --ip             Pull IP addresses'
+        print '     -p --ports          Pull targeted ports'
+        print '     -m --malware        Pull malware'
+        print '     -c --credentials    Pull both usernames and passwords'
+        print '     --usernames         Pull usernames'
+        print '     --passwords         Pull passwords'
         print '     -v                  Verbose'
         print '     -V                  Very Verbose'
         sys.exit()
@@ -91,6 +97,7 @@ distinctIPList = executeQuery("db.session.distinct('source_ip')").split(',')
 for ip in distinctIPList:
   ip = re.sub(r'\\n\']','',ip)
   if re.match(r'\d+\.\d+\.\d+\.\d+',ip):
+    print ip
     allIP.append(ip)
 
 def getHoneypots():
