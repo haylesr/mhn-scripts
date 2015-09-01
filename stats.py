@@ -152,7 +152,7 @@ def getCountryStats():
       if ip in countriesByIP:
         if countriesByIP[ip] == country:
           numAttacks = numAttacks + int(executeQuery("db.session.find({'source_ip':'"+ip+"'}).count()"))
-    print "   Percent of all attacks: " + str(round(distinctCountries/float(totalAttacks),4)*100) + "%"
+    print "   Percent of all attacks: " + str(round(numAttacks/float(totalAttacks),4)*100) + "%"
 
     if verbose:
       print "   Total IP addresses: " + str(countByCountry[country])
