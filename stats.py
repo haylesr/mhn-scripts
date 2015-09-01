@@ -4,11 +4,14 @@ import re
 
 countriesByIP = {}
 countByCountry = {}
-ips = []
+allIP = []
 notIdentified = []
 
 def executeQuery(query):
   return os.popen("mongo mnemosyne --quiet --eval \""+query+"\"").read()
+
+def executeCommand(command):
+  return os.popen(command).read()
 
 #totalAttacks = int(os.popen("mongo mnemosyne --quiet --eval \"db.session.count()\"").read())
 totalAttacks = executeQuery("db.session.count()")
@@ -22,35 +25,35 @@ numAmosAttacks = executeQuery("db.session.find({'honeypot':'amun'}).count()")
 numP0fAttacks =  executeQuery("db.session.find({'honeypot':'p0f'}).count()")
 numUniquePorts = executeQuery("db.session.distinct('destination_port').length")
 numMalwareSamples = executeQuery("db.file.count()")
-distinctIPs = executeQuery("db.session.distinct('source_ip')")
+distinctIPList = executeQuery("db.session.distinct('source_ip')").split(',')
+distinctCountries = []
 
 
-for ip in distinctIPs.split(','):
+for ip in distinctIPList:
   ip = re.sub(r'\\n\']','',ip)
   if re.match(r'\d+\.\d+\.\d+\.\d+',ip):
-    output = os.popen("geoiplookup "+ip).read()
-    output = re.sub(r'.*[A-Z]+, ','',output)
-    output = re.sub(r'\n','',output)
-    if output == "GeoIP Country Edition: IP Address not found":
+    country = executeCommand("geoiplookup "+ip)
+    country = re.sub(r'.*[A-Z]+, ','',country)
+    country = re.sub(r'\n','',country)
+    if country == "GeoIP Country Edition: IP Address not found":
       notIdentified.append(ip)
     else:
-      ips.append(ip)
-      countriesByIP[ip] = output
-      if output in countByCountry:
-        countByCountry[output] = countByCountry[output]+1
+      allIP.append(ip)
+      countriesByIP[ip] = country
+      if country in countByCountry:
+        countByCountry[country] = countByCountry[country]+1
       else:
-        countByCountry[output] = 1
-unique = []
+        countByCountry[country] = 1
 for country in countriesByIP.values():
-  if country not in unique:
-    unique.append(country)
+  if country not in distinctCountries:
+    distinctCountries.append(country)
 
 def getCountryStats():
-  for country in unique:
+  for country in distinctCountries:
     x = 0
     print country + ": "
     print "   Percent of unique IP addresses: " + str(round(countByCountry[country]/float(len(countriesByIP)),4)*100) + "%"
-    for ip in ips:
+    for ip in allIP:
       if countriesByIP[ip] == country:
         x = x + int(os.popen("mongo mnemosyne --quiet --eval \"db.session.find({'source_ip':'"+ip+"'}).count()\"").read())
     print "   Percent of total attacks: " + str(round(x/float(totalAttacks),4)*100) + "%"
@@ -67,7 +70,7 @@ def getCountryStats():
 print
 print "Total attacks: " + str(totalAttacks)
 print
-print "Unique countries: " + str(len(unique))
+print "Unique countries: " + str(len(distinctCountries))
 print
 print "Unique IP addresses: " + str(numUniqueIPs)
 print "Kippo attacks: " + str(numKippoAttacks)
