@@ -20,7 +20,7 @@ numDionaeaAttacks = os.popen("mongo mnemosyne --quiet --eval \"db.session.find({
 numGlastopfAttacks = os.popen("mongo mnemosyne --quiet --eval \"db.session.find({'honeypot':'glastopf'}).count()\"").read()
 numAmosAttacks = os.popen("mongo mnemosyne --quiet --eval \"db.session.find({'honeypot':'amun'}).count()\"").read()
 numP0fAttacks =  os.popen("mongo mnemosyne --quiet --eval \"db.session.find({'honeypot':'p0f'}).count()\"").read()
-numUniquePorts os.popen("mongo mnemosyne --quiet --eval \"db.session.distinct('destination_port').length\"").read()
+numUniquePorts = os.popen("mongo mnemosyne --quiet --eval \"db.session.distinct('destination_port').length\"").read()
 numMalwareSamples = os.popen("mongo mnemosyne --quiet --eval \"db.file.count()\"").read()
 
 
