@@ -32,7 +32,7 @@ credentials = False
 usernames = False
 passwords = False
 
-fonts = ['big','bulbhead','block','doh','doom','isometric1','isometric3','larry3d','rectangles','smkeyboard']
+fonts = ['big','bulbhead','block','doom','isometric1','isometric3','larry3d','rectangles','smkeyboard']
 
 #Proccess all command line arguments and gracefully exit upon failure
 try:
@@ -120,10 +120,10 @@ def getAddresses():
       print "      "+ip
 
 def getUsernames():
-  print "   Unique usernames: " + executeQuery("db.session.distinct('auth_attempts.login').length")
+  print "Unique usernames: " + executeQuery("db.session.distinct('auth_attempts.login').length")
 
 def getPasswords():
-  print "   Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
+  print "Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
 
 def getCountryStats():
   for ip in allIP:
@@ -164,12 +164,14 @@ def getCountryStats():
     print
 
   print "Unique countries: " + str(len(distinctCountries))
+  print
 
   if verbose or veryVerbose:
     print "**Could not identify " + str(len(notIdentified)) + " IPs**"
   if veryVerbose:
     for ip in notIdentified:
       print "   "+ip
+    print
 
 def main():
   print figlet_format('Stats!', font=fonts[random.randrange(len(fonts))])
