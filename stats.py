@@ -139,16 +139,19 @@ def getUsernames():
 
 def getPasswords():
   print "Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
-  passwordList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
+  passwordList = executeQuery("db.session.aggregate([{$unwind:"$auth_attempts"},{$group:{_id:"$auth_attempts.password",count:{$sum:1}}},{$sort:{count:-1}}])").split('\n')
   for password in passwordList:
-    password = re.sub(r'\n','',password)
-    password = re.sub(r'\'','',password)
-    countByPassword[password] = int(executeQuery("db.session.find({'auth_attempts.password':'"+password+"'}).count()"))
-    print countByPassword[password]
-  print figlet_format('Passwords', font='small')
-  graph = Pyasciigraph()
-  for line in  graph.graph('', countByPassword.items()):
-    print(line)
+    print password
+  #passwordList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
+  #for password in passwordList:
+  #  password = re.sub(r'\n','',password)
+  #  password = re.sub(r'\'','',password)
+  #  countByPassword[password] = int(executeQuery("db.session.find({'auth_attempts.password':'"+password+"'}).count()"))
+  #  print countByPassword[password]
+  #print figlet_format('Passwords', font='small')
+  #graph = Pyasciigraph()
+  #for line in  graph.graph('', countByPassword.items()):
+  #  print(line)
 
 def getCountryStats():
   for ip in allIP:
