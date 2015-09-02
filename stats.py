@@ -145,8 +145,10 @@ def getPasswords():
     match = re.search(r'\"(.*)\".*\w+(\d*)\w+},',pair)
     if match:
       password = match.group(1)
-      count = match.group(2)
       print password
+    match = re.search(r'\w+(\d*)\w+}',pair)
+    if match:
+      count = match.group(1)
       print count
   #passwordList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
   #for password in passwordList:
