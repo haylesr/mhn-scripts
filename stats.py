@@ -4,6 +4,7 @@ import re
 import getopt
 import sys
 import random
+import json
 
 from pyfiglet import figlet_format
 from ascii_graph import Pyasciigraph
@@ -139,7 +140,7 @@ def getUsernames():
 
 def getPasswords():
   print "Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
-  passwordList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.password','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
+  passwordList = json.loads(executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.password','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})")
   for password in passwordList:
     print password
   #passwordList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
