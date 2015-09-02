@@ -142,10 +142,7 @@ def getPasswords():
   passwordList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
   for password in passwordList:
     password = re.sub(r'\\n\']','',password)
-    if password in countByPassword:
-      countByPassword[password] = countByPassword[password]+1
-    else:
-      countByPassword[password] = 1
+    countByPassword[password] = executeQuery("db.session.find({'auth_attempts.password':'"+password+"''}).count()")
   print figlet_format('Passwords', font='small')
   graph = Pyasciigraph()
   for line in  graph.graph('', countByPassword.items()):
