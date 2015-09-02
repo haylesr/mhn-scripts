@@ -140,8 +140,7 @@ def getUsernames():
 
 def getPasswords():
   print "Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
-  passwordList = json.loads(executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.password','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})")
-  print passwordList
+  passwordList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.password','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
   for password in passwordList:
     print password
   #passwordList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
