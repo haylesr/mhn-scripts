@@ -91,7 +91,7 @@ for opt, arg in options:
 
 #Execute mongodb query
 def executeQuery(query):
-  return os.popen("mongo mnemosyne --quiet --eval "+query+").read()
+  return os.popen("mongo mnemosyne --quiet --eval \""+query+"\"").read()
 
 #Execute OS command
 def executeCommand(command):
