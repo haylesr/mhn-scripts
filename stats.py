@@ -139,7 +139,7 @@ def getUsernames():
 
 def getPasswords():
   print "Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
-  passwordList = executeQuery("db.session.aggregate([{$unwind:"$auth_attempts"},{$group:{_id:"$auth_attempts.password",count:{$sum:1}}},{$sort:{count:-1}}])").split('\n')
+  passwordList = executeQuery("db.session.aggregate([{$unwind:'$auth_attempts'},{$group:{_id:'$auth_attempts.password',count:{$sum:1}}},{$sort:{count:-1}}])").split('\n')
   for password in passwordList:
     print password
   #passwordList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
