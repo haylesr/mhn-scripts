@@ -141,7 +141,8 @@ def getPasswords():
   print "Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
   passwordList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
   for password in passwordList:
-    password = re.sub(r'\\n\']','',password)
+    password = re.sub(r'\n','',password)
+    password = re.sub(r'\'','',password)
     countByPassword[password] = int(executeQuery("db.session.find({'auth_attempts.password':'"+password+"'}).count()"))
     print countByPassword[password]
   print figlet_format('Passwords', font='small')
