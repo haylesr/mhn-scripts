@@ -8,10 +8,14 @@ import random
 from pyfiglet import figlet_format
 from ascii_graph import Pyasciigraph
 
-#Initialize dictionaries and list for tracking country specific metrics
+#Initialize dictionaries and list for tracking specific metrics
 countriesByIP = {}
 countByCountry = {}
 distinctCountries = []
+
+countByUsername = {}
+countByPassword = {}
+countByPort = {}
 
 #Initialize lists to track IP addresses
 allIP = []
@@ -124,10 +128,28 @@ def getUsernames():
   usernameList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
   for username in usernameList:
     username = re.sub(r'\\n\']','',username)
-    print username
+    if username in countByUsername:
+        countByUsername[username] = countByUsername[username]+1
+      else:
+        countByUsername[username] = 1
+  print figlet_format('Usernames', font='small')
+  graph = Pyasciigraph()
+  for line in  graph.graph('', countByUsername.items()):
+    print(line)
 
 def getPasswords():
   print "Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
+  passwordList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
+  for password in passwordList:
+    password = re.sub(r'\\n\']','',password)
+    if password in countByPassword:
+        countByPassword[password] = countByPassword[password]+1
+      else:
+        countByPassword[password] = 1
+  print figlet_format('Passwords', font='small')
+  graph = Pyasciigraph()
+  for line in  graph.graph('', countByPassword.items()):
+    print(line)
 
 def getCountryStats():
   for ip in allIP:
