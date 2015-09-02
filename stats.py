@@ -6,6 +6,7 @@ import sys
 import random
 
 from pyfiglet import figlet_format
+from ascii_graph import Pyasciigraph
 
 #Initialize dictionaries and list for tracking country specific metrics
 countriesByIP = {}
