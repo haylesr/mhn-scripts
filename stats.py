@@ -112,9 +112,6 @@ def getMalware():
 
 def getPorts():
   print "Distinct ports attacked: " + executeQuery("db.session.distinct('destination_port').length")
-  graph = Pyasciigraph()
-  for line in  graph.graph('Ports Attacked', test):
-    print(line)
 
 def getAddresses():
   print "Distinct IP addresses: " + executeQuery("db.session.distinct('source_ip').length")
@@ -145,6 +142,10 @@ def getCountryStats():
   for country in countriesByIP.values():
     if country not in distinctCountries:
       distinctCountries.append(country)
+
+  graph = Pyasciigraph()
+  for line in  graph.graph('IP Addresses by Country', countByCountry.items()):
+    print(line)
 
   for country in distinctCountries:
     numAttacks = 0
