@@ -129,9 +129,9 @@ def getUsernames():
   for username in usernameList:
     username = re.sub(r'\\n\']','',username)
     if username in countByUsername:
-        countByUsername[username] = countByUsername[username]+1
-      else:
-        countByUsername[username] = 1
+      countByUsername[username] = countByUsername[username]+1
+    else:
+      countByUsername[username] = 1
   print figlet_format('Usernames', font='small')
   graph = Pyasciigraph()
   for line in  graph.graph('', countByUsername.items()):
@@ -143,9 +143,9 @@ def getPasswords():
   for password in passwordList:
     password = re.sub(r'\\n\']','',password)
     if password in countByPassword:
-        countByPassword[password] = countByPassword[password]+1
-      else:
-        countByPassword[password] = 1
+      countByPassword[password] = countByPassword[password]+1
+    else:
+      countByPassword[password] = 1
   print figlet_format('Passwords', font='small')
   graph = Pyasciigraph()
   for line in  graph.graph('', countByPassword.items()):
