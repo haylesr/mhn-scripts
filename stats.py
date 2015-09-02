@@ -121,7 +121,10 @@ def getAddresses():
 
 def getUsernames():
   print "Unique usernames: " + executeQuery("db.session.distinct('auth_attempts.login').length")
-  print executeQuery("db.session.find({},{auth_attempts.login:1, _id:0 })").split(',')
+  usernameList = executeQuery("db.session.find({},{auth_attempts.login:1, _id:0 })").split(',')
+  for username in usernameList:
+    username = re.sub(r'\\n\']','',username)
+    print username
 
 def getPasswords():
   print "Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
