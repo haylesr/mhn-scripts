@@ -113,7 +113,7 @@ def getHoneypots():
   print "p0f attacks: " + executeQuery("db.session.find({'honeypot':'p0f'}).count()")
 
 def getMalware():
-  print "Malware samples: " + executeQuery("db.file.count()")
+  print "Malware samples: " + executeQuery("db.session.distinct('attachments.hashes.sha512').length")
 
 def getPorts():
   print "Distinct ports attacked: " + executeQuery("db.session.distinct('destination_port').length")
