@@ -149,23 +149,11 @@ def getPasswords():
     print "Raw: "+pair
     match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
     if match:
-      password = match.group(1)
-      count = match.group(2)
-      print password + " " + count
-    match = re.search(r'\w(\d*)\w}',pair)
-    if match:
-      count = match.group(1)
-      print count
-  #passwordList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
-  #for password in passwordList:
-  #  password = re.sub(r'\n','',password)
-  #  password = re.sub(r'\'','',password)
-  #  countByPassword[password] = int(executeQuery("db.session.find({'auth_attempts.password':'"+password+"'}).count()"))
-  #  print countByPassword[password]
-  #print figlet_format('Passwords', font='small')
-  #graph = Pyasciigraph()
-  #for line in  graph.graph('', countByPassword.items()):
-  #  print(line)
+      countByPassword[match.group(1)] = match.group(2)
+  print figlet_format('Passwords', font='small')
+  graph = Pyasciigraph()
+  for line in  graph.graph('', countByPassword.items()):
+    print(line)
 
 def getCountryStats():
   for ip in allIP:
