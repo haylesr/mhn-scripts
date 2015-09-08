@@ -129,7 +129,7 @@ def getAddresses():
 
 def getUsernames():
   print "Unique usernames: " + executeQuery("db.session.distinct('auth_attempts.login').length")
-  usernameList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
+  usernameList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.username','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
   for username in usernameList:
     username = re.sub(r'\\n\']','',username)
     if is_ascii(username):
