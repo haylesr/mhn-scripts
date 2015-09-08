@@ -130,7 +130,10 @@ def getUsernames():
   for username in usernameList:
     print username
     username = re.sub(r'\\n\']','',username)
+    if username == ' ':
+      username = "null"
     print username
+
     if username in countByUsername:
       countByUsername[username] = countByUsername[username]+1
     else:
