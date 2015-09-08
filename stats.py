@@ -130,18 +130,28 @@ def getAddresses():
 
 def getUsernames():
   print "Unique usernames: " + executeQuery("db.session.distinct('auth_attempts.login').length")
-  usernameList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.login','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
-  for username in usernameList:
-    username = re.sub(r'\\n\']','',username)
-    if is_ascii(username):
-      if username in countByUsername:
-        countByUsername[username] = countByUsername[username]+1
-      else:
-        countByUsername[username] = 1
-  print figlet_format('Usernames', font='small')
-  graph = Pyasciigraph()
-  for line in  graph.graph('', countByUsername.items()):
-    print(line)
+  
+  if verbose:
+    usernameList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.login','count':{\$sum:1}}},{\$sort:{count:-1}},{\$limit:10}]).forEach(function(x){printjson(x)})").split('\n')
+    for pair in usernameList:
+      match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
+      if match:
+        countByUsername[match.group(1)] = int(match.group(2))
+    print figlet_format('Usernames ( Top 10 )', font='small')
+    graph = Pyasciigraph()
+    for line in  graph.graph('', sorted(countByUsername.items(), key=operator.itemgetter(1), reverse=True)):
+      print(line)
+
+  if veryVerbose:
+    usernameList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.login','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
+    for pair in usernameList:
+      match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
+      if match:
+        countByUsername[match.group(1)] = int(match.group(2))
+    print figlet_format('Usernames', font='small')
+    graph = Pyasciigraph()
+    for line in  graph.graph('', sorted(countByUsername.items(), key=operator.itemgetter(1), reverse=True)):
+      print(line)
 
 def getPasswords():
   print "Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
@@ -152,7 +162,7 @@ def getPasswords():
       match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
       if match:
         countByPassword[match.group(1)] = int(match.group(2))
-    print figlet_format('Passwords (Top 10)', font='small')
+    print figlet_format('Passwords ( Top 10 )', font='small')
     graph = Pyasciigraph()
     for line in  graph.graph('', sorted(countByPassword.items(), key=operator.itemgetter(1), reverse=True)):
       print(line)
