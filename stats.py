@@ -151,10 +151,9 @@ def getPasswords():
     match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
     if match:
       countByPassword[match.group(1)] = int(match.group(2))
-  countByPassword = sorted(countByPassword.items(), key=operator.itemgetter(1))
   print figlet_format('Passwords', font='small')
   graph = Pyasciigraph()
-  for line in  graph.graph('', countByPassword.items()):
+  for line in  graph.graph('', sorted(countByPassword.items(), key=operator.itemgetter(1)).items()):
     print(line)
 
 def getCountryStats():
