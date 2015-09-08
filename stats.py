@@ -129,9 +129,8 @@ def getUsernames():
   usernameList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
   for username in usernameList:
     print username
+    print ":".join("{:02x}".format(ord(c)) for c in username)
     username = re.sub(r'\\n\']','',username)
-    if username == ' ':
-      username = "null"
     print username
 
     if username in countByUsername:
