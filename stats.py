@@ -153,7 +153,7 @@ def getPasswords():
       countByPassword[match.group(1)] = int(match.group(2))
   print figlet_format('Passwords', font='small')
   graph = Pyasciigraph()
-  for line in  graph.graph('', sorted(countByPassword.items(), key=operator.itemgetter(1)).items()):
+  for line in  graph.graph('', sorted(countByPassword.items(), key=operator.itemgetter(1))):
     print(line)
 
 def getCountryStats():
