@@ -129,7 +129,7 @@ def getAddresses():
 
 def getUsernames():
   print "Unique usernames: " + executeQuery("db.session.distinct('auth_attempts.login').length")
-  usernameList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.username','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
+  usernameList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.login','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
   for username in usernameList:
     username = re.sub(r'\\n\']','',username)
     if is_ascii(username):
@@ -146,6 +146,7 @@ def getPasswords():
   print "Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
   passwordList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.password','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
   for pair in passwordList:
+    print "Raw: "+pair
     match = re.search(r':\w+"(.*)",',pair)
     if match:
       password = match.group(1)
