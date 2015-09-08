@@ -129,6 +129,8 @@ def getUsernames():
   usernameList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
   for username in usernameList:
     username = re.sub(r'\\n\']','',username)
+    if username == '':
+      username = "null"
     print username
     if username in countByUsername:
       countByUsername[username] = countByUsername[username]+1
@@ -136,9 +138,6 @@ def getUsernames():
       countByUsername[username] = 1
   print figlet_format('Usernames', font='small')
   graph = Pyasciigraph()
-  test = {}
-  test["root"] = 1
-  test["test"] = 2
   for line in  graph.graph('', countByUsername.items()):
     print(line)
 
