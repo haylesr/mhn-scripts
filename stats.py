@@ -98,6 +98,9 @@ def executeQuery(query):
 def executeCommand(command):
   return os.popen(command).read()
 
+def is_ascii(s):
+  return all(ord(c) < 128 for c in s)
+
 totalAttacks = executeQuery("db.session.count()")
 distinctIPList = executeQuery("db.session.distinct('source_ip')").split(',')
 for ip in distinctIPList:
@@ -128,15 +131,12 @@ def getUsernames():
   print "Unique usernames: " + executeQuery("db.session.distinct('auth_attempts.login').length")
   usernameList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
   for username in usernameList:
-    print username
-    print ":".join("{:02x}".format(ord(c)) for c in username)
     username = re.sub(r'\\n\']','',username)
-    print username
-
-    if username in countByUsername:
-      countByUsername[username] = countByUsername[username]+1
-    else:
-      countByUsername[username] = 1
+    if is_ascii(username):
+      if username in countByUsername:
+        countByUsername[username] = countByUsername[username]+1
+      else:
+        countByUsername[username] = 1
   print figlet_format('Usernames', font='small')
   graph = Pyasciigraph()
   for line in  graph.graph('', countByUsername.items()):
