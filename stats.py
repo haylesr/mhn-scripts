@@ -5,6 +5,7 @@ import getopt
 import sys
 import random
 import json
+import operator
 
 from pyfiglet import figlet_format
 from ascii_graph import Pyasciigraph
@@ -150,6 +151,7 @@ def getPasswords():
     match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
     if match:
       countByPassword[match.group(1)] = int(match.group(2))
+  countByPassword = sorted(countByPassword.items(), key=operator.itemgetter(1))
   print figlet_format('Passwords', font='small')
   graph = Pyasciigraph()
   for line in  graph.graph('', countByPassword.items()):
