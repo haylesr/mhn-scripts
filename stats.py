@@ -130,15 +130,16 @@ def getUsernames():
   for username in usernameList:
     username = re.sub(r'\\n\']','',username)
     print username
-    if username == "":
-      username = "null"
     if username in countByUsername:
       countByUsername[username] = countByUsername[username]+1
     else:
       countByUsername[username] = 1
   print figlet_format('Usernames', font='small')
   graph = Pyasciigraph()
-  for line in  graph.graph('', countByUsername.items()):
+  test = {}
+  test["root"] = 1
+  test["test"] = 2
+  for line in  graph.graph('', test.items()): #countByUsername.items()):
     print(line)
 
 def getPasswords():
