@@ -128,6 +128,7 @@ def getUsernames():
   print "Unique usernames: " + executeQuery("db.session.distinct('auth_attempts.login').length")
   usernameList = executeQuery("db.session.distinct('auth_attempts.login')").split(',')
   for username in usernameList:
+    print username
     username = re.sub(r'\\n\']','',username)
     if username in countByUsername:
       countByUsername[username] = countByUsername[username]+1
