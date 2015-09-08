@@ -147,10 +147,11 @@ def getPasswords():
   passwordList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.password','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
   for pair in passwordList:
     print "Raw: "+pair
-    match = re.search(r':\w+"(.*)",',pair)
+    match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
     if match:
       password = match.group(1)
-      print password
+      count = match.group(2)
+      print password + " " + count
     match = re.search(r'\w(\d*)\w}',pair)
     if match:
       count = match.group(1)
