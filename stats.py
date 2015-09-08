@@ -139,7 +139,7 @@ def getUsernames():
   test = {}
   test["root"] = 1
   test["test"] = 2
-  for line in  graph.graph('Test', test.items()): #countByUsername.items()):
+  for line in  graph.graph('', test.items()): #countByUsername.items()):
     print(line)
 
 def getPasswords():
