@@ -244,6 +244,24 @@ def getCountryStats():
     if verbose or veryVerbose:
       print
 
+  if veryVerbose:
+    graph = Pyasciigraph()
+    for line in  graph.graph('Attacks by Country', sorted(attacksByCountry.items(), key=operator.itemgetter(1), reverse=True)):
+      print(line)
+  else:
+    top10 = {}
+    counter = 0
+    for country,count in sorted(attacksByCountry.items(), key=operator.itemgetter(1), reverse=True):
+      if counter >= 10:
+        break
+      top10[country] = count
+      counter = counter + 1
+    print figlet_format('Attacks by Country ( Top 10 )', font='small')
+    graph = Pyasciigraph()
+    for line in  graph.graph('', sorted(top10.items(), key=operator.itemgetter(1), reverse=True)):
+      print(line)
+  print    
+
   print "Unique countries: " + str(len(distinctCountries))
   print
 
