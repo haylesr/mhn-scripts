@@ -208,8 +208,12 @@ def getCountryStats():
       print(line)
   else:
     top10 = {}
+    counter = 0
     for country,count in sorted(countByCountry.items(), key=operator.itemgetter(1), reverse=True):
+      if counter >= 10:
+        break
       top10[country] = count
+      counter = counter + 1
     graph = Pyasciigraph()
     for line in  graph.graph('IP Addresses by Country', top10.items()):
       print(line)
@@ -236,7 +240,8 @@ def getCountryStats():
       for ip,location in countriesByIP.items():
         if location == country:
           print "      "+ip
-    print
+    if verbose or veryVerbose:
+      print
 
   print "Unique countries: " + str(len(distinctCountries))
   print
