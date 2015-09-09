@@ -133,7 +133,18 @@ def getAddresses():
 def getUsernames():
   print "Unique usernames: " + executeQuery("db.session.distinct('auth_attempts.login').length")
   
-  if verbose:
+  if verbose or veryVerbose:
+    usernameList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.login','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
+    for pair in usernameList:
+      match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
+      if match:
+        countByUsername[match.group(1)] = int(match.group(2))
+    print figlet_format('Usernames', font='small')
+    graph = Pyasciigraph()
+    for line in  graph.graph('', sorted(countByUsername.items(), key=operator.itemgetter(1), reverse=True)):
+      print(line)
+    print
+  else:
     usernameList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.login','count':{\$sum:1}}},{\$sort:{count:-1}},{\$limit:10}]).forEach(function(x){printjson(x)})").split('\n')
     for pair in usernameList:
       match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
@@ -145,40 +156,27 @@ def getUsernames():
       print(line)
     print
 
-  if veryVerbose:
-    usernameList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.login','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
-    for pair in usernameList:
-      match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
-      if match:
-        countByUsername[match.group(1)] = int(match.group(2))
-    print figlet_format('Usernames', font='small')
-    graph = Pyasciigraph()
-    for line in  graph.graph('', sorted(countByUsername.items(), key=operator.itemgetter(1), reverse=True)):
-      print(line)
-    print
-
 def getPasswords():
   print "Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
-  
-  if verbose:
-    passwordList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.password','count':{\$sum:1}}},{\$sort:{count:-1}},{\$limit:10}]).forEach(function(x){printjson(x)})").split('\n')
-    for pair in passwordList:
-      match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
-      if match:
-        countByPassword[match.group(1)] = int(match.group(2))
-    print figlet_format('Passwords ( Top 10 )', font='small')
-    graph = Pyasciigraph()
-    for line in  graph.graph('', sorted(countByPassword.items(), key=operator.itemgetter(1), reverse=True)):
-      print(line)
-    print
 
-  if veryVerbose:
+  if verbose or veryVerbose:
     passwordList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.password','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
     for pair in passwordList:
       match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
       if match:
         countByPassword[match.group(1)] = int(match.group(2))
     print figlet_format('Passwords', font='small')
+    graph = Pyasciigraph()
+    for line in  graph.graph('', sorted(countByPassword.items(), key=operator.itemgetter(1), reverse=True)):
+      print(line)
+    print
+  else:
+    passwordList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.password','count':{\$sum:1}}},{\$sort:{count:-1}},{\$limit:10}]).forEach(function(x){printjson(x)})").split('\n')
+    for pair in passwordList:
+      match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
+      if match:
+        countByPassword[match.group(1)] = int(match.group(2))
+    print figlet_format('Passwords ( Top 10 )', font='small')
     graph = Pyasciigraph()
     for line in  graph.graph('', sorted(countByPassword.items(), key=operator.itemgetter(1), reverse=True)):
       print(line)
