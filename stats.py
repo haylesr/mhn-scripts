@@ -6,6 +6,7 @@ import sys
 import random
 import json
 import operator
+import itertools
 
 from pyfiglet import figlet_format
 from ascii_graph import Pyasciigraph
@@ -14,6 +15,7 @@ from ascii_graph import Pyasciigraph
 countriesByIP = {}
 countByCountry = {}
 distinctCountries = []
+attacksByCountry = {}
 
 countByUsername = {}
 countByPassword = {}
@@ -141,6 +143,7 @@ def getUsernames():
     graph = Pyasciigraph()
     for line in  graph.graph('', sorted(countByUsername.items(), key=operator.itemgetter(1), reverse=True)):
       print(line)
+    print
 
   if veryVerbose:
     usernameList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.login','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
@@ -152,6 +155,7 @@ def getUsernames():
     graph = Pyasciigraph()
     for line in  graph.graph('', sorted(countByUsername.items(), key=operator.itemgetter(1), reverse=True)):
       print(line)
+    print
 
 def getPasswords():
   print "Unique passwords: " + executeQuery("db.session.distinct('auth_attempts.password').length")
@@ -166,6 +170,7 @@ def getPasswords():
     graph = Pyasciigraph()
     for line in  graph.graph('', sorted(countByPassword.items(), key=operator.itemgetter(1), reverse=True)):
       print(line)
+    print
 
   if veryVerbose:
     passwordList = executeQuery("db.session.aggregate([{\$unwind:'\$auth_attempts'},{\$group:{_id:'\$auth_attempts.password','count':{\$sum:1}}},{\$sort:{count:-1}}]).forEach(function(x){printjson(x)})").split('\n')
@@ -177,6 +182,7 @@ def getPasswords():
     graph = Pyasciigraph()
     for line in  graph.graph('', sorted(countByPassword.items(), key=operator.itemgetter(1), reverse=True)):
       print(line)
+    print
 
 def getCountryStats():
   for ip in allIP:
@@ -196,19 +202,28 @@ def getCountryStats():
     if country not in distinctCountries:
       distinctCountries.append(country)
 
-  graph = Pyasciigraph()
-  for line in  graph.graph('IP Addresses by Country', countByCountry.items()):
-    print(line)
+  if veryVerbose:
+    graph = Pyasciigraph()
+    for line in  graph.graph('IP Addresses by Country', sorted(countByCountry.items(), key=operator.itemgetter(1), reverse=True)):
+      print(line)
+  else:
+    graph = Pyasciigraph()
+    for line in  graph.graph('IP Addresses by Country', sorted(itertools.islice(countByCountry,10).items(), key=operator.itemgetter(1), reverse=True)):
+      print(line)
+  print
 
   for country in distinctCountries:
     numAttacks = 0
-    print country + ": "
-    print "   Percent of all IP addresses: " + str(round(countByCountry[country]/float(len(countriesByIP)),4)*100) + "%"
+    if veryVerbose: 
+      print country + ": "
+      print "   Percent of all IP addresses: " + str(round(countByCountry[country]/float(len(countriesByIP)),4)*100) + "%"
     for ip in allIP:
       if ip in countriesByIP:
         if countriesByIP[ip] == country:
           numAttacks = numAttacks + int(executeQuery("db.session.find({'source_ip':'"+ip+"'}).count()"))
-    print "   Percent of all attacks: " + str(round(numAttacks/float(totalAttacks),4)*100) + "%"
+    attacksByCountry[country] = numAttacks
+    if veryVerbose:
+      print "   Percent of all attacks: " + str(round(numAttacks/float(totalAttacks),4)*100) + "%"
 
     if verbose:
       print "   Total IP addresses: " + str(countByCountry[country])
