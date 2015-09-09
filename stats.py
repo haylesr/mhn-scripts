@@ -214,8 +214,9 @@ def getCountryStats():
         break
       top10[country] = count
       counter = counter + 1
+    print figlet_format('IP Addresses by Country ( Top 10 )', font='small')
     graph = Pyasciigraph()
-    for line in  graph.graph('IP Addresses by Country', top10.items()):
+    for line in  graph.graph('', sorted(top10.items(), key=operator.itemgetter(1), reverse=True)):
       print(line)
   print
 
