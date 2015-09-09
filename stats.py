@@ -200,6 +200,8 @@ def getCountryStats():
     if country not in distinctCountries:
       distinctCountries.append(country)
 
+  print "Unique countries: " + str(len(distinctCountries))
+
   if veryVerbose:
     graph = Pyasciigraph()
     for line in  graph.graph('IP Addresses by Country', sorted(countByCountry.items(), key=operator.itemgetter(1), reverse=True)):
@@ -259,9 +261,6 @@ def getCountryStats():
     for line in  graph.graph('', sorted(top10.items(), key=operator.itemgetter(1), reverse=True)):
       print(line)
   print    
-
-  print "Unique countries: " + str(len(distinctCountries))
-  print
 
   if verbose or veryVerbose:
     print "**Could not identify " + str(len(notIdentified)) + " IPs**"
