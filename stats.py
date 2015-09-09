@@ -207,8 +207,8 @@ def getCountryStats():
     for line in  graph.graph('IP Addresses by Country', sorted(countByCountry.items(), key=operator.itemgetter(1), reverse=True)):
       print(line)
   else:
-    for country in sorted(countByCountry.items(), key=operator.itemgetter(1), reverse=True):
-      top10[country] = countByCountry[country]
+    for country,count in sorted(countByCountry.items(), key=operator.itemgetter(1), reverse=True):
+      top10[country] = count
     graph = Pyasciigraph()
     for line in  graph.graph('IP Addresses by Country', top10.items()):
       print(line)
