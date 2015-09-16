@@ -120,14 +120,13 @@ def getHoneypots():
 
 def getMalware():
   print "Malware samples: " + executeQuery("db.session.distinct('attachments.hashes.sha512').length")
-
-  if verbose or veryVerbose:
-    print "md5:"
-    md5List = executeQuery("db.session.distinct('attachments.hashes.md5')").split(',')
-    i = 1
-    for malware in md5List:
-      print "     "+str(i)+": "+malware
-      i = i + 1
+  
+  print figlet_format('md5 hashes', font='small')
+  md5List = executeQuery("db.session.distinct('attachments.hashes.md5')").split(',')
+  i = 1
+  for malware in md5List:
+    print "     "+str(i)+": "+malware
+    i = i + 1
 
 def getPorts():
   print "Distinct ports attacked: " + executeQuery("db.session.distinct('destination_port').length")
