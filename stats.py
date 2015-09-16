@@ -113,7 +113,7 @@ for ip in distinctIPList:
     allIP.append(ip)
 
 def getHoneypots():
-  honeypotList = executeQuery("db.session.aggregate({\$group:{_id:'\$destination_port','count':{\$sum:1}}},{\$sort:{count:-1}}).forEach(function(x){printjson(x)})").split('\n')
+  honeypotList = executeQuery("db.session.aggregate({\$group:{_id:'\$honeypot','count':{\$sum:1}}},{\$sort:{count:-1}}).forEach(function(x){printjson(x)})").split('\n')
   for pair in honeypotList:
     match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
     if match:
