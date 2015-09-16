@@ -135,7 +135,7 @@ def getPorts():
   if verbose or veryVerbose:
     portList = executeQuery("db.session.aggregate({\$group:{_id:'\$destination_port','count':{\$sum:1}}},{\$sort:{count:-1}},{\$limit:10}).forEach(function(x){printjson(x)})").split('\n')
     for pair in portList:
-      match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
+      match = re.search(r'"_id" : "(\d+)", "count" : (\d+) }',pair)
       if match:
         countByPort[match.group(1)] = int(match.group(2))
     print figlet_format('Ports', font='small')
@@ -145,10 +145,9 @@ def getPorts():
     print
   else:
     portList = executeQuery("db.session.aggregate({\$group:{_id:'\$destination_port','count':{\$sum:1}}},{\$sort:{count:-1}},{\$limit:10}).forEach(function(x){printjson(x)})").split('\n')
-    print portList
     for pair in portList:
       print pair
-      match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
+      match = re.search(r'"_id" : "(\d+)", "count" : (\d+) }',pair)
       if match:
         print match.group(1) + " " + match.group(2)
         countByPort[match.group(1)] = int(match.group(2))
