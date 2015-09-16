@@ -123,7 +123,7 @@ def getMalware():
 
   if verbose or veryVerbose:
     print "md5:"
-    md5List = executeQuery("db.session.distinct('attachments.hashes.md5').length").split(',')
+    md5List = executeQuery("db.session.distinct('attachments.hashes.md5')").split(',')
     i = 1
     for malware in md5List:
       print "     "+str(i)+": "+malware
