@@ -140,7 +140,7 @@ def getPorts():
         countByPort[match.group(1)] = int(match.group(2))
     print figlet_format('Ports', font='small')
     graph = Pyasciigraph()
-    for line in  graph.graph('', sorted(countByPorts.items(), key=operator.itemgetter(1), reverse=True)):
+    for line in  graph.graph('', sorted(countByPort.items(), key=operator.itemgetter(1), reverse=True)):
       print(line)
     print
   else:
@@ -151,7 +151,7 @@ def getPorts():
         countByPort[match.group(1)] = int(match.group(2))
     print figlet_format('Ports ( Top 10 )', font='small')
     graph = Pyasciigraph()
-    for line in  graph.graph('', sorted(countByPorts.items(), key=operator.itemgetter(1), reverse=True)):
+    for line in  graph.graph('', sorted(countByPort.items(), key=operator.itemgetter(1), reverse=True)):
       print(line)
     print
 
