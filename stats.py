@@ -16,6 +16,7 @@ countriesByIP = {}
 countByCountry = {}
 distinctCountries = []
 attacksByCountry = {}
+attacksByHoneypot = {}
 
 countByUsername = {}
 countByPassword = {}
@@ -112,14 +113,19 @@ for ip in distinctIPList:
     allIP.append(ip)
 
 def getHoneypots():
-  print "Kippo attacks: " + executeQuery("db.session.find({'honeypot':'kippo'}).count()")
-  print "Dionaea attacks: " + executeQuery("db.session.find({'honeypot':'dionaea'}).count()")
-  print "Glastopf attacks: " + executeQuery("db.session.find({'honeypot':'glastopf'}).count()")
-  print "Amun attacks: " + executeQuery("db.session.find({'honeypot':'amun'}).count()")
-  print "p0f attacks: " + executeQuery("db.session.find({'honeypot':'p0f'}).count()")
+  honeypotList = executeQuery("db.session.aggregate({\$group:{_id:'\$destination_port','count':{\$sum:1}}},{\$sort:{count:-1}}).forEach(function(x){printjson(x)})").split('\n')
+    for pair in honeypotList:
+      match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
+      if match:
+        attacksByHoneypot[match.group(1)] = int(match.group(2))
+    print figlet_format('Honeypots', font='small')
+    graph = Pyasciigraph()
+    for line in  graph.graph('', sorted(attacksByHoneypot.items(), key=operator.itemgetter(1), reverse=True)):
+      print(line)
+    print
 
 def getMalware():
-  print "Malware samples: " + executeQuery("db.session.distinct('attachments.hashes.sha512').length")
+  print "Malware samples: " + executeQuery("db.session.distinct('attachments.hashes.md5').length")
   
   print figlet_format('md5 hashes', font='small')
   md5List = executeQuery("db.session.distinct('attachments.hashes.md5')").split(',')
