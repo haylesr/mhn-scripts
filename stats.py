@@ -58,35 +58,35 @@ for opt, arg in options:
         print
         print 'Options:'
         print '     --help              Print help menu'
-        print '     -a --all            Get all metrics'
-        print '     -g --geo            Get geo location (could take a little while)'
-        print '     -h --honeypots      Separate honepot types'
-        print '     -i --ip             Pull IP addresses'
-        print '     -p --ports          Pull targeted ports'
-        print '     -m --malware        Pull malware'
-        print '     -c --credentials    Pull both usernames and passwords'
+        print '     --all               Get all metrics'
+        print '     --geo               Get geo location (could take a little while)'
+        print '     --honeypots         Separate honepot types'
+        print '     --ip                Pull IP addresses'
+        print '     --ports             Pull targeted ports'
+        print '     --malware           Pull malware'
+        print '     --credentials       Pull both usernames and passwords'
         print '     --usernames         Pull usernames'
         print '     --passwords         Pull passwords'
         print '     -v                  Verbose'
         print '     -V                  Very Verbose'
         sys.exit()
-    if opt in ('-g','--geo'):
+    if opt in ('--geo'):
       geo = True
-    if opt in ('-a','--all'):
+    if opt in ('--all'):
       everything = True
-    if opt in ('-h','--honeypots'):
+    if opt in ('--honeypots'):
       honeypots = True
     if opt in ('-v'):
       verbose = True
     if opt in ('-V'):
       veryVerbose = True
-    if opt in ('-p','--ports'):
+    if opt in ('--ports'):
       ports = True
-    if opt in ('-m','--malware'):
+    if opt in ('--malware'):
       malware = True
-    if opt in ('-i','--ip'):
+    if opt in ('--ip'):
       addresses = True
-    if opt in ('-c','--credentials'):
+    if opt in ('--credentials'):
       credentials = True
     if opt in ('--usernames'):
       usernames = True
