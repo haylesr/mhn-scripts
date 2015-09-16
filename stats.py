@@ -148,6 +148,7 @@ def getPorts():
     for pair in portList:
       match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
       if match:
+        print match.group(1) + " " + match.group(2)
         countByPort[match.group(1)] = int(match.group(2))
     print figlet_format('Ports ( Top 10 )', font='small')
     graph = Pyasciigraph()
