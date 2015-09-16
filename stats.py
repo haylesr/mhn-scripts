@@ -133,7 +133,7 @@ def getPorts():
   print "Distinct ports attacked: " + executeQuery("db.session.distinct('destination_port').length")
 
   if verbose or veryVerbose:
-    portList = executeQuery("db.session.aggregate({\$group:{_id:'\$destination_port','count':{\$sum:1}}},{\$sort:{count:-1}},{\$limit:10}).forEach(function(x){printjson(x)})").split('\n')
+    portList = executeQuery("db.session.aggregate({\$group:{_id:'\$destination_port','count':{\$sum:1}}},{\$sort:{count:-1}}).forEach(function(x){printjson(x)})").split('\n')
     for pair in portList:
       match = re.search(r'"_id" : (\d+), "count" : (\d+) }',pair)
       if match:
