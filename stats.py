@@ -114,15 +114,15 @@ for ip in distinctIPList:
 
 def getHoneypots():
   honeypotList = executeQuery("db.session.aggregate({\$group:{_id:'\$destination_port','count':{\$sum:1}}},{\$sort:{count:-1}}).forEach(function(x){printjson(x)})").split('\n')
-    for pair in honeypotList:
-      match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
-      if match:
-        attacksByHoneypot[match.group(1)] = int(match.group(2))
-    print figlet_format('Honeypots', font='small')
-    graph = Pyasciigraph()
-    for line in  graph.graph('', sorted(attacksByHoneypot.items(), key=operator.itemgetter(1), reverse=True)):
-      print(line)
-    print
+  for pair in honeypotList:
+    match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
+    if match:
+      attacksByHoneypot[match.group(1)] = int(match.group(2))
+  print figlet_format('Honeypots', font='small')
+  graph = Pyasciigraph()
+  for line in  graph.graph('', sorted(attacksByHoneypot.items(), key=operator.itemgetter(1), reverse=True)):
+    print(line)
+  print
 
 def getMalware():
   print "Malware samples: " + executeQuery("db.session.distinct('attachments.hashes.md5').length")
