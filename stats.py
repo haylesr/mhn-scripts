@@ -121,8 +121,39 @@ def getHoneypots():
 def getMalware():
   print "Malware samples: " + executeQuery("db.session.distinct('attachments.hashes.sha512').length")
 
+  if verbose or veryVerbose:
+    print "md5:"
+    md5List = executeQuery("db.session.distinct('attachments.hashes.md5').length").split(',')
+    i = 1
+    for malware in md5List
+      print "     "+i+": "+malware
+      i = i + 1
+
 def getPorts():
   print "Distinct ports attacked: " + executeQuery("db.session.distinct('destination_port').length")
+
+  if verbose or veryVerbose:
+    portList = executeQuery("db.session.aggregate({\$group:{_id:'\$destination_port','count':{\$sum:1}}},{\$sort:{count:-1}},{\$limit:10}).forEach(function(x){printjson(x)})").split('\n')
+    for pair in portList:
+      match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
+      if match:
+        countByPort[match.group(1)] = int(match.group(2))
+    print figlet_format('Ports', font='small')
+    graph = Pyasciigraph()
+    for line in  graph.graph('', sorted(countByPorts.items(), key=operator.itemgetter(1), reverse=True)):
+      print(line)
+    print
+  else:
+    portList = executeQuery("db.session.aggregate({\$group:{_id:'\$destination_port','count':{\$sum:1}}},{\$sort:{count:-1}},{\$limit:10}).forEach(function(x){printjson(x)})").split('\n')
+    for pair in portList:
+      match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
+      if match:
+        countByPort[match.group(1)] = int(match.group(2))
+    print figlet_format('Ports ( Top 10 )', font='small')
+    graph = Pyasciigraph()
+    for line in  graph.graph('', sorted(countByPorts.items(), key=operator.itemgetter(1), reverse=True)):
+      print(line)
+    print
 
 def getAddresses():
   print "Distinct IP addresses: " + executeQuery("db.session.distinct('source_ip').length")
