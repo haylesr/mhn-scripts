@@ -145,6 +145,7 @@ def getPorts():
     print
   else:
     portList = executeQuery("db.session.aggregate({\$group:{_id:'\$destination_port','count':{\$sum:1}}},{\$sort:{count:-1}},{\$limit:10}).forEach(function(x){printjson(x)})").split('\n')
+    print portList
     for pair in portList:
       print pair
       match = re.search(r'"_id" : "(.*)", "count" : (\d+) }',pair)
